@@ -3,121 +3,154 @@ import { Component, ReactNode } from "react"
 import {
   StyleSheet,
   Dimensions,
+  Image,
+  Text,
+  View,
 } from "react-native"
 import { Pages } from "../types/Navigation"
 import React from "react"
 import { PokemonServices } from "../services/pokemon/pokemon.services"
+import { PokemonAbility, PokemonDetailObj, PokemonStat, PokemonType } from "../types/PokemonAbilites"
+import { SafeAreaView } from "react-native-safe-area-context"
+import { globalStyles } from "../styles/global"
+import { ScrollView } from "react-native-gesture-handler"
 
 export interface Props extends NativeStackScreenProps<Pages, "Detail"> {}
 
 interface State {
-  description: string
+  data?: PokemonDetailObj
 }
 export default class PokemonDetail extends Component<Props, State> {
   private pokemonServices
   constructor(props: Props) {
     super(props)
     this.state = {
-      description: "",
+      data: undefined
     }
 
     this.pokemonServices = new PokemonServices()
   }
 
   async componentDidMount() {
+    this.loadPokemon()
+  }
+
+  loadPokemon = async () => {
+    const {
+      route: {
+        params: { id },
+      },
+    } = this.props
+
+    const res = await this.pokemonServices.getPokemonById(id)
+    this.setState({data: res})
 
   }
 
   render(): ReactNode {
     const {
       route: {
-        params: { pokemon },
+        params: { id },
       },
     } = this.props
+    const pokemonDetail = this.state.data
 
     return (
-      <></>
+      <SafeAreaView style={[globalStyles.screen, styles.container]}>
+          <ScrollView>
+              {pokemonDetail?.sprites?.front_default && (
+                  <Image
+                      source={{ uri: pokemonDetail.sprites.front_default }}
+                      style={styles.sprite}
+                  />
+              )}
+
+              <Text style={styles.name}>{pokemonDetail?.name}</Text>
+
+              <View style={styles.typesContainer}>
+                  {pokemonDetail?.types?.map((item: PokemonType) => (
+                      <Text key={item.type.name} style={styles.type}>
+                          {item.type.name}
+                      </Text>
+                  ))}
+              </View>
+
+              <View style={styles.statsContainer}>
+                  <Text style={styles.sectionTitle}>Stats:</Text>
+                  {pokemonDetail?.stats?.map((item: PokemonStat) => (
+                      <Text key={item.stat.name} style={styles.stat}>
+                          {item.stat.name}: {item.base_stat}
+                      </Text>
+                  ))}
+              </View>
+
+              <View style={styles.abilitiesContainer}>
+                  <Text style={styles.sectionTitle}>Abilities:</Text>
+                  {pokemonDetail?.abilities?.map((item: PokemonAbility) => (
+                      <Text key={item.ability.name} style={styles.ability}>
+                          {item.ability.name}
+                      </Text>
+                  ))}
+              </View>
+
+          </ScrollView>
+      </SafeAreaView>
     )
   }
 }
 
 const styles = StyleSheet.create({
-  sprite: {
-    margin: 20,
-    width: 160,
-    height: 160,
-  },
   container: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
+      flex: 1,
+      padding: 16,
   },
-  description: {
-    fontWeight: "500",
-    textAlign: "justify",
-    fontStyle: "italic",
+  sprite: {
+      width: 200,
+      height: 200,
+      alignSelf: 'center',
   },
-  row: {
-    width: Dimensions.get("window").width,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
+  name: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      marginVertical: 16,
+      color: 'white',
   },
-  card: {
-    width: Dimensions.get("window").width * 0.45,
-    height: Dimensions.get("window").width * 0.5,
-    margin: 5,
-    borderRadius: 15,
-    display: "flex",
-    alignItems: "flex-start",
-    justifyContent: "flex-start",
-    borderWidth: 1,
-    borderColor: "#D4D4D4",
-    padding: 8,
-    overflow: "scroll",
+  typesContainer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      marginBottom: 16,
   },
   type: {
-    textTransform: "uppercase",
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderWidth: 1,
-    borderRadius: 50,
-    marginRight: 4,
+      padding: 8,
+      marginHorizontal: 4,
+      backgroundColor: '#e0e0e0',
+      borderRadius: 4,
   },
-  types: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "stretch",
-    justifyContent: "space-evenly",
+  statsContainer: {
+      marginBottom: 16,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 20,
+  abilitiesContainer: {
+      marginBottom: 16,
+  },
+  sectionTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginBottom: 8,
+      color: 'white',
   },
   stat: {
-    fontSize: 17,
-    fontWeight: "600",
-  },
-  statValue: {
-    fontWeight: "400",
-    paddingBottom: 20,
-  },
-  abilities: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "stretch",
-    justifyContent: "space-around",
+      fontSize: 16,
+      marginBottom: 4,
+      color: 'white',
   },
   ability: {
-    textTransform: "capitalize",
-    fontWeight: "500",
-    paddingVertical: 5,
-    fontSize: 15,
+      fontSize: 16,
+      marginBottom: 4,
+      color: 'white',
   },
-  activity: {
-    padding: 50,
+  additionalInfo: {
+      color: 'white',
   },
-})
+});
 

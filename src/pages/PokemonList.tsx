@@ -1,13 +1,11 @@
 import React, { Component } from "react"
-import { View, StyleSheet, FlatList, TextInput, ListRenderItem, Text, ActivityIndicator } from "react-native"
+import { View, StyleSheet, FlatList, TextInput, ListRenderItem, Text, ActivityIndicator, Pressable } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { Pages } from "../types/Navigation"
-import { POKE_API } from "../utils"
 import { NameUrl, pokemonObj } from "../types/Pokemon"
 import PokemonCard from "../components/PokemonCard"
 import { COLORS } from "../styles/colors"
-import { SCREEN_WIDTH } from "../constant/constant"
 import { PokemonServices } from "../services/pokemon/pokemon.services"
 import Spacer from "../components/Spacer"
 import { globalStyles } from "../styles/global"
@@ -22,6 +20,7 @@ export interface State {
 
 const LIMIT = 20
 const DEBOUNCE_DELAY = 300
+const PAGE_OPTION = [1,2,3,4]
 
 export default class PokemonList extends Component<Props, State> {
   private pokemonServices: PokemonServices
@@ -80,8 +79,6 @@ export default class PokemonList extends Component<Props, State> {
             isLoading: false
           }))
         }
-
-        
       }
 
     } catch (error) {
@@ -103,11 +100,14 @@ export default class PokemonList extends Component<Props, State> {
   }
 
   renderItem: ListRenderItem<pokemonObj> = ({ item, index }) => {
+    const {navigation} = this.props
+
     return (
       <PokemonCard
+        navigation={navigation}
         data-testid="pokemon-item"
         data={item}
-        id={index + 1}
+        id={(index + 1) + (((this.state.page - 1) * LIMIT))}
       />
     )
   }
@@ -121,8 +121,15 @@ export default class PokemonList extends Component<Props, State> {
     )
   }
 
+  handlePage = (selectedPage:number) => {
+    this.setState({
+      page: selectedPage - 1,
+      pokemonList: []
+    }, this.loadPokemon)
+  }
+
   render() {
-    const { query, pokemonList, isLoading } = this.state
+    const { query, pokemonList } = this.state
 
     return (
       <SafeAreaView style={[globalStyles.screen, styles.container]}>
@@ -132,6 +139,19 @@ export default class PokemonList extends Component<Props, State> {
           onChangeText={this.handleQueryChange} 
           value={query}
         />
+        <Spacer heigth={20}/>
+
+        <View style={styles.paginationContainer}>
+        {
+          PAGE_OPTION.map((item)=> (
+            <Pressable onPress={()=>this.handlePage(item)} key={item} style={styles.paginationBtn}>
+              <Text style={styles.paginationText}>
+                {item}
+              </Text>
+            </Pressable>
+          ))
+        }
+      </View>
         
         <Spacer heigth={40}/>
         
@@ -139,8 +159,7 @@ export default class PokemonList extends Component<Props, State> {
           data={pokemonList}
           renderItem={this.renderItem}
           numColumns={2}
-          onEndReached={this.loadPokemon}
-          onEndReachedThreshold={0.5}
+          // onEndReached={this.loadPokemon}
           ListFooterComponent={this.renderFooter}
           ItemSeparatorComponent={() => <Spacer width={20} heigth={20} />}
           contentContainerStyle={styles.listContainer}
@@ -170,5 +189,22 @@ const styles = StyleSheet.create({
   loader: {
     marginVertical: 20,
     alignItems: 'center'
-  }
+  },
+  paginationContainer: {
+    flexDirection: "row",
+    justifyContent: 'space-between'
+  },
+  paginationText:{
+    color: COLORS.white,
+    textAlign: 'center'
+  },
+  paginationBtn:{
+    backgroundColor: COLORS.gray1,
+    width: 22,
+    height: 22,
+    borderRadius: 2,
+    borderColor: COLORS.white,
+    borderWidth: 1,
+    marginRight: 10
+  },
 })

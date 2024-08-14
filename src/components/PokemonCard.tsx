@@ -1,30 +1,29 @@
 
 import React from 'react';
-import {Image, StyleSheet, Text, View} from 'react-native';
+import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
 import Spacer from './Spacer';
 import { getPokemonImage } from '../services/main';
 import { SCREEN_WIDTH } from '../constant/constant';
 import { COLORS } from '../styles/colors';
 import { pokemonObj } from '../types/Pokemon';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Pages } from '../types/Navigation';
 
 interface Props {
   data: pokemonObj
   id: number
+  navigation: NativeStackNavigationProp<Pages, "List", undefined>
 }
 
 export const PokemonCard = (props:Props): JSX.Element => {
   const item = props.data
 
   function extractPokemonNumber(url: string) {
-    // Use a regular expression to match the number at the end of the URL
     const match = url.match(/\/(\d+)\.png$/);
     
-    // If a match is found, return the number as an integer
     if (match && match[1]) {
       return parseInt(match[1], 10);
     }
-    
-    // If no match is found, return null
     return null;
   }
 
@@ -32,7 +31,13 @@ export const PokemonCard = (props:Props): JSX.Element => {
 
   return (
     <View style={styles.container}>
-      <View key={item.name} style={styles.pokemonCard}>
+      <Pressable 
+        onPress={() =>
+          props.navigation.navigate("Detail", {
+            id: extractPokemonNumber(imageUrl) as number,
+          })
+        }
+        key={item.name} style={styles.pokemonCard}>
         <View >
           <View key={item.name}>
             {
@@ -53,7 +58,7 @@ export const PokemonCard = (props:Props): JSX.Element => {
             <Spacer heigth={20}/>
           </View>
         </View>
-      </View>
+      </Pressable>
     </View>
   )
 };
