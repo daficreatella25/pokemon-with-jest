@@ -159,6 +159,8 @@ export default class PokemonList extends Component<Props, State> {
           data={pokemonList}
           renderItem={this.renderItem}
           numColumns={2}
+          // this note behave correctly on expo browser, 
+          // cant use emulator because cant run on really old expo version
           // onEndReached={this.loadPokemon}
           ListFooterComponent={this.renderFooter}
           ItemSeparatorComponent={() => <Spacer width={20} heigth={20} />}
