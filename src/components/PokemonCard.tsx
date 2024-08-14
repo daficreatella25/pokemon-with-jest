@@ -1,90 +1,108 @@
+import { Component } from "react"
+import {
+  Pressable,
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ActivityIndicator,
+  Dimensions,
+} from "react-native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import { Pages } from "../types/Navigation"
+import { NameUrl, Pokemon } from "../types/Pokemon"
+import React from "react"
+import { COLORS } from "../styles/colors"
+import Spacer from "./Spacer"
+import { getPokemonImage } from "../services/main"
 
-import React from 'react';
-import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
-import Spacer from './Spacer';
-import { getPokemonImage } from '../services/main';
-import { SCREEN_WIDTH } from '../constant/constant';
-import { COLORS } from '../styles/colors';
-import { pokemonObj } from '../types/Pokemon';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Pages } from '../types/Navigation';
-
-interface Props {
-  data: pokemonObj
-  id: number
-  navigation: NativeStackNavigationProp<Pages, "List", undefined>
+export interface PokemonCardProps {
+    data: NameUrl
+    id: number
+    navigation: NativeStackNavigationProp<Pages, "List", undefined>
 }
 
-export const PokemonCard = (props:Props): JSX.Element => {
-  const item = props.data
-
-  function extractPokemonNumber(url: string) {
-    const match = url.match(/\/(\d+)\.png$/);
-    
-    if (match && match[1]) {
-      return parseInt(match[1], 10);
-    }
-    return null;
+interface State {
+  pokemonData?: Pokemon
+}
+export default class PokemonCard extends Component<PokemonCardProps, State> {
+  constructor(props: PokemonCardProps) {
+    super(props)
   }
 
-  const imageUrl = props.data?.sprites?.front_default ? props.data?.sprites?.front_default : getPokemonImage(props.id)
+  async componentDidMount() {
+  }
 
-  return (
-    <View style={styles.container}>
-      <Pressable 
-        onPress={() =>
-          props.navigation.navigate("Detail", {
-            id: extractPokemonNumber(imageUrl) as number,
-          })
+  render() {
+    const { navigation, data, id  } = this.props
+    const item = data
+
+    const imageUrl = data?.sprites?.front_default ? data?.sprites?.front_default : getPokemonImage(id)
+
+
+    function extractPokemonNumber(url: string) {
+        const match = url.match(/\/(\d+)\.png$/);
+        
+        if (match && match[1]) {
+            return parseInt(match[1], 10);
         }
-        key={item.name} style={styles.pokemonCard}>
-        <View >
-          <View key={item.name}>
-            {
-              props.data?.sprites?.front_default ? 
-                <Image
-                  source={{ uri: imageUrl }}
-                  style={styles.pokemonCardImage}
-                  />
-              :
-                <Image
-                  source={{ uri: imageUrl }}
-                  style={styles.pokemonCardImage}
-                  />
-            }
+        return null;
+    }
 
-            <Text style={styles.pokemonCardText}>{item.name}</Text>
+    return (
+        <View style={styles.container}>
+            <Pressable 
+                onPress={() =>
+                navigation.navigate("Detail", {
+                    id: extractPokemonNumber(imageUrl) as number,
+                })
+                }
+                key={item.name} style={styles.pokemonCard}>
+                <View >
+                <View key={item.name}>
+                    {
+                    data?.sprites?.front_default ? 
+                        <Image
+                        source={{ uri: imageUrl }}
+                        style={styles.pokemonCardImage}
+                        />
+                    :
+                        <Image
+                        source={{ uri: imageUrl }}
+                        style={styles.pokemonCardImage}
+                        />
+                    }
 
-            <Spacer heigth={20}/>
-          </View>
+                    <Text style={styles.pokemonCardText}>{item.name}</Text>
+
+                    <Spacer heigth={20}/>
+                </View>
+                </View>
+            </Pressable>
         </View>
-      </Pressable>
-    </View>
-  )
-};
-
-export default PokemonCard;
-
+    )
+  }
+}
 
 const styles = StyleSheet.create({
-  container: {
-    width: '50%',
-  },
-  pokemonCard: {
-    backgroundColor: COLORS.gray1,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10
-  },
-  pokemonCardImage: {
-    width: 80,
-    height: 80
-  },
-  pokemonCardText: {
-    color: COLORS.white,
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center'
-  }
-});
+    container: {
+      width: '50%',
+    },
+    pokemonCard: {
+      backgroundColor: COLORS.gray1,
+      borderRadius: 8,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 10
+    },
+    pokemonCardImage: {
+      width: 80,
+      height: 80
+    },
+    pokemonCardText: {
+      color: COLORS.white,
+      alignItems: 'center',
+      justifyContent: 'center',
+      textAlign: 'center'
+    }
+  });

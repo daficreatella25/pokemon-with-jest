@@ -1,9 +1,9 @@
 import React, { Component } from "react"
-import { View, StyleSheet, FlatList, TextInput, ListRenderItem, Text, ActivityIndicator, Pressable } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { View, StyleSheet, FlatList, TextInput, Text, ActivityIndicator, Pressable, SafeAreaView } from "react-native"
+
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { Pages } from "../types/Navigation"
-import { NameUrl, pokemonObj } from "../types/Pokemon"
+import { NameUrl } from "../types/Pokemon"
 import PokemonCard from "../components/PokemonCard"
 import { COLORS } from "../styles/colors"
 import { PokemonServices } from "../services/pokemon/pokemon.services"
@@ -50,21 +50,21 @@ export default class PokemonList extends Component<Props, State> {
 
     try {
       if(this.state.query === ''){
-        console.log('masok')
         const response = await this.pokemonServices.getPokemonByPage({
           offset: this.state.page * LIMIT,
           limit: LIMIT,
           query: this.state.query
         })
 
-        this.setState(prevState => ({
-          pokemonList: [...prevState.pokemonList, ...response.results],
-          page: prevState.page + 1,
-          isLoading: false
-        }))
-
+        if(response?.results){
+          this.setState(prevState => ({
+            pokemonList: [...prevState.pokemonList, ...response?.results],
+            page: prevState.page + 1,
+            isLoading: false
+          }))
+        }
       }else{
-        const response = await this.pokemonServices.getPokemonByPage({
+        const response = await this.pokemonServices.getPokemonByName({
           offset: this.state.page * LIMIT,
           limit: LIMIT,
           query: this.state.query
@@ -97,19 +97,6 @@ export default class PokemonList extends Component<Props, State> {
     this.debounceTimeout = setTimeout(() => {
       this.setState({ pokemonList: [], page: 0 }, this.loadPokemon)
     }, DEBOUNCE_DELAY)
-  }
-
-  renderItem: ListRenderItem<pokemonObj> = ({ item, index }) => {
-    const {navigation} = this.props
-
-    return (
-      <PokemonCard
-        navigation={navigation}
-        data-testid="pokemon-item"
-        data={item}
-        id={(index + 1) + (((this.state.page - 1) * LIMIT))}
-      />
-    )
   }
 
   renderFooter = () => {
@@ -157,7 +144,16 @@ export default class PokemonList extends Component<Props, State> {
         
         <FlatList
           data={pokemonList}
-          renderItem={this.renderItem}
+          renderItem={({item, index})=> {
+            const {navigation} = this.props
+            return (
+              <PokemonCard
+                navigation={navigation}
+                data={item}
+                id={(index + 1) + (((this.state.page - 1) * LIMIT))}
+              />
+            )
+          }}
           numColumns={2}
           // this note behave correctly on expo browser, 
           // cant use emulator because cant run on really old expo version

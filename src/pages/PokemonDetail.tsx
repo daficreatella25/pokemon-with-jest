@@ -6,14 +6,14 @@ import {
   Image,
   Text,
   View,
+  ScrollView,
+  SafeAreaView,
 } from "react-native"
 import { Pages } from "../types/Navigation"
 import React from "react"
 import { PokemonServices } from "../services/pokemon/pokemon.services"
 import { PokemonAbility, PokemonDetailObj, PokemonStat, PokemonType } from "../types/PokemonAbilites"
-import { SafeAreaView } from "react-native-safe-area-context"
 import { globalStyles } from "../styles/global"
-import { ScrollView } from "react-native-gesture-handler"
 
 export interface Props extends NativeStackScreenProps<Pages, "Detail"> {}
 
@@ -43,16 +43,14 @@ export default class PokemonDetail extends Component<Props, State> {
     } = this.props
 
     const res = await this.pokemonServices.getPokemonById(id)
-    this.setState({data: res})
+
+    if(res){
+      this.setState({data: res})
+    }
 
   }
 
   render(): ReactNode {
-    const {
-      route: {
-        params: { id },
-      },
-    } = this.props
     const pokemonDetail = this.state.data
 
     return (

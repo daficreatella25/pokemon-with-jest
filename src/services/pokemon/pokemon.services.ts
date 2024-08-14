@@ -1,26 +1,32 @@
 
-import { pokemonDto, pokemonObj, pokemonRespObj } from "../../types/Pokemon";
-import { abilitesObj } from "../../types/PokemonAbilites";
+import { NameUrl, pokemonDto, pokemonRespObj } from "../../types/Pokemon";
+import { abilitesObj, PokemonDetailObj } from "../../types/PokemonAbilites";
 import { ENDPOINT, apiInstance } from "../main";
 
 export class PokemonServices {
   async getPokemonByPage(param: pokemonDto) {
     let endpoint = `${ENDPOINT.pokemon}?offset=${param.offset}&limit=${param.limit}`;
-    if(param.query){
-      endpoint = `${ENDPOINT.pokemon}/${param.query}`
-    }
-    const res = await apiInstance.get<pokemonRespObj | pokemonObj, unknown>(endpoint);
+    const res = await apiInstance.get<pokemonRespObj, unknown>(endpoint);
+  
+    if (!res.ok) throw res;
+
+    return res.data;
+    
+  }
+
+  async getPokemonByName(param: pokemonDto) {
+    const endpoint = `${ENDPOINT.pokemon}/${param.query}`
+    const res = await apiInstance.get<NameUrl, unknown>(endpoint);
 
     if (!res.ok) throw res;
 
     return res.data;
   }
 
-  async getPokemonById(id: string){
-    const endpoint = `${ENDPOINT.pokemonDetail(id)}`;
-    console.log(endpoint)
+  async getPokemonById(id: number){
+    const endpoint = `${ENDPOINT.pokemonDetail(id.toString())}`;
 
-    const res = await apiInstance.get<abilitesObj, unknown>(endpoint)
+    const res = await apiInstance.get<PokemonDetailObj, unknown>(endpoint)
 
     if(!res.ok)  throw res
 

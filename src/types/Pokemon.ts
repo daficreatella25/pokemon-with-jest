@@ -55,14 +55,14 @@ export interface pokemonDto {
   query?:string
 }
 
-export interface pokemonObj {
-  name: string;
-  sprites?: {
-    front_default: string
-  }
-}
+// export interface pokemonObj {
+//   name: string;
+//   sprites?: {
+//     front_default: string
+//   }
+// }
 
-export type pokemonRespObj = withPagination<pokemonObj>;
+export type pokemonRespObj = withPagination<NameUrl>;
 
 
 
