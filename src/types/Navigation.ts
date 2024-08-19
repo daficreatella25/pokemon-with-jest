@@ -1,5 +1,5 @@
 export type Pages = {
-  List: undefined
-  Detail: { id: number }
+    List: undefined
+    Detail: { id: number }
 }
 

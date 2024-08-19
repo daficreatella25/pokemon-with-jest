@@ -1,8 +1,8 @@
-import { StyleSheet, ViewStyle } from "react-native";
-import { COLORS } from "./colors";
+import { StyleSheet, ViewStyle } from "react-native"
+import { COLORS } from "./colors"
 
 export const globalStyles = StyleSheet.create({
     screen: {
-        backgroundColor: COLORS.background
-    }
+        backgroundColor: COLORS.background,
+    },
 })
