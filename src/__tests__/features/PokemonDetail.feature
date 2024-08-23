@@ -1,6 +1,6 @@
 Feature: Pokemon Detail
 
-    Scenario: Render Pokemon Detail
-        Given I am on the Pokemon Detail screen
-        When I successfully load Pokemon Detail screen
-        Then I should see details of the Pokemon
+Scenario: User views Pokemon Detail
+  Given I am a User loading the Pokemon Detail
+  When I load the Pokemon Detail screen
+  Then I should see the Pokemon's details
