@@ -41,6 +41,8 @@ export default class PokemonList extends Component<Props, State> {
         this.pokemonServices = new PokemonServices()
     }
 
+    getPokemonServices = () => this.pokemonServices
+
     componentDidMount() {
         this.loadPokemon()
     }
@@ -123,6 +125,7 @@ export default class PokemonList extends Component<Props, State> {
         return (
             <SafeAreaView style={[globalStyles.screen, styles.container]}>
                 <TextInput
+                    testID="pokemon-search-input"
                     style={styles.textInputContainer}
                     placeholder="Search"
                     onChangeText={this.handleQueryChange}
@@ -145,6 +148,7 @@ export default class PokemonList extends Component<Props, State> {
                 <Spacer heigth={40} />
 
                 <FlatList
+                    testID="pokemon-list"
                     data={pokemonList}
                     renderItem={({ item, index }) => {
                         const { navigation } = this.props
